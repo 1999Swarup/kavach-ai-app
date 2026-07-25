@@ -114,6 +114,11 @@
     <div class="card" id="results">
       <h2>2 · Your AI Risk Snapshot</h2>
       <p class="sub" id="resultsSub">Run a scan above to see results. Showing a real recorded run below.</p>
+      <div class="btnrow" id="dlbar" style="margin:0 0 16px">
+        <button class="btn" onclick="window.print()">⬇ Save as PDF</button>
+        <button class="btn" onclick="kavachDownloadHTML()">⬇ Download HTML</button>
+        <button class="btn" onclick="kavachDownloadJSON()">⬇ Download JSON</button>
+      </div>
       <div id="report"></div>
     </div>
   </div>
@@ -245,6 +250,22 @@ function renderReport(){
       Readiness/gap assessment — not a legal certification.</p>`;
 }
 renderReport();
+
+// --- Downloadable report ---
+function _dl(name, text, type){
+  const b=new Blob([text],{type:type}); const u=URL.createObjectURL(b);
+  const a=document.createElement('a'); a.href=u; a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+function kavachDownloadJSON(){
+  _dl('kavach-report.json', JSON.stringify(RUN, null, 2), 'application/json');
+}
+function kavachDownloadHTML(){
+  const rep=document.getElementById('report').innerHTML;
+  const css="body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:#070b16;color:#eef2fb;max-width:900px;margin:0 auto;padding:32px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #223049;padding:8px 12px;text-align:left;font-size:14px}.pill{padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#05121f}.kpis{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}.k{border:1px solid #223049;border-radius:12px;padding:12px 18px;text-align:center}.banner{border:1px solid #4f8cff;border-radius:12px;padding:14px;margin:10px 0}.card{background:#141c30;border:1px solid #223049;border-radius:12px;padding:16px;margin:10px 0}.muted{color:#9aa8c6}code{background:#0a0e1a;padding:2px 6px;border-radius:6px}";
+  const html="<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Kavach AI Risk Snapshot — "+RUN.client+"</title><style>"+css+"</style></head><body><h1>Kavach AI — AI Risk Snapshot</h1><p class=\"muted\">Prepared for "+RUN.client+"</p>"+rep+"<p class=\"muted\" style=\"font-size:13px;margin-top:20px\">Readiness/gap assessment — not a legal certification. © Kavach AI.</p></body></html>";
+  _dl('kavach-report.html', html, 'text/html');
+}
 </script>
 </body>
 </html>
