@@ -84,15 +84,15 @@
 <section>
   <div class="wrap">
     <div class="card">
-      <h2>1 · Connect your model</h2>
-      <p class="sub">Pick a provider, enter its details, test the connection — then run the scan. Secrets stay with the backend and are never logged.</p>
+      <h2>1 · Connect your model or agent</h2>
+      <p class="sub">Pick a <strong>model</strong> or an <strong>agent</strong>, enter its details, test the connection — then run the scan. Secrets stay with the backend and are never logged.</p>
       <div class="steps">
         <div class="st"><b>Step 1</b><br><span>Choose provider</span></div>
         <div class="st"><b>Step 2</b><br><span>Enter endpoint / key</span></div>
         <div class="st"><b>Step 3</b><br><span>Test &amp; run</span></div>
       </div>
 
-      <label for="provider">Provider</label>
+      <label for="provider">Provider (models &amp; agents)</label>
       <select id="provider"></select>
 
       <div id="fields" class="grid2"></div>
@@ -135,14 +135,15 @@
 <script>
 // --- Provider registry (mirrors the scanner's PROVIDERS) ---
 const PROVIDERS = {
-  "openai":       {label:"OpenAI", fields:[["api_key","API key",true],["model","Model (gpt-4o-mini)",false]]},
-  "azure-openai": {label:"Azure OpenAI / AI Foundry", fields:[["endpoint","Resource endpoint",true],["api_key","API key",true],["deployment","Deployment name",true]]},
-  "anthropic":    {label:"Anthropic", fields:[["api_key","API key",true],["model","Model (claude-3-5-sonnet)",false]]},
-  "vertex":       {label:"Google Vertex AI", fields:[["endpoint","Model generateContent URL",true],["api_key","OAuth access token",true]]},
-  "ollama":       {label:"Local (Ollama)", fields:[["endpoint","Base URL (http://localhost:11434)",false],["model","Model (llama3)",false]]},
-  "github-models":{label:"GitHub Models (GHCP)", fields:[["api_key","GitHub token",true],["model","Model (gpt-4o-mini)",false]]},
-  "http":         {label:"Generic HTTP endpoint", fields:[["endpoint","Endpoint URL",true]]},
-  "foundry-agent":{label:"Azure AI Foundry Prompt Agent", fields:[["endpoint","Project endpoint",false],["agent_id","Agent id",true]], entra:true},
+  "openai":       {label:"OpenAI", group:"Models", fields:[["api_key","API key",true],["model","Model (gpt-4o-mini)",false]]},
+  "azure-openai": {label:"Azure OpenAI / AI Foundry", group:"Models", fields:[["endpoint","Resource endpoint",true],["api_key","API key",true],["deployment","Deployment name",true]]},
+  "anthropic":    {label:"Anthropic", group:"Models", fields:[["api_key","API key",true],["model","Model (claude-3-5-sonnet)",false]]},
+  "vertex":       {label:"Google Vertex AI", group:"Models", fields:[["endpoint","Model generateContent URL",true],["api_key","OAuth access token",true]]},
+  "ollama":       {label:"Local (Ollama)", group:"Models", fields:[["endpoint","Base URL (http://localhost:11434)",false],["model","Model (llama3)",false]]},
+  "github-models":{label:"GitHub Models (GHCP)", group:"Models", fields:[["api_key","GitHub token",true],["model","Model (gpt-4o-mini)",false]]},
+  "http":         {label:"Generic HTTP endpoint", group:"Models", fields:[["endpoint","Endpoint URL",true]]},
+  "foundry-agent":{label:"Azure AI Foundry Prompt Agent", group:"Agents", fields:[["endpoint","Project endpoint",false],["agent_id","Agent id",true]], entra:true},
+  "agent-http":   {label:"Custom agent (messages API)", group:"Agents", fields:[["endpoint","Agent endpoint URL",true],["conversation_id","Conversation id (optional)",false]], agent:true},
 };
 
 // --- Real recorded run (from an actual Kavach multi-technique scan) ---
@@ -176,7 +177,10 @@ const statusEl = document.getElementById("status");
 const noteEl = document.getElementById("providerNote");
 
 Object.entries(PROVIDERS).forEach(([id,p])=>{
-  const o=document.createElement("option"); o.value=id; o.textContent=p.label; sel.appendChild(o);
+  const groupLabel = p.group || "Models";
+  let og = sel.querySelector(`optgroup[label="${groupLabel}"]`);
+  if(!og){ og=document.createElement("optgroup"); og.label=groupLabel; sel.appendChild(og); }
+  const o=document.createElement("option"); o.value=id; o.textContent=p.label; og.appendChild(o);
 });
 sel.value="github-models";
 
@@ -189,7 +193,11 @@ function renderFields(){
       <input data-key="${key}" type="${isSecret?'password':'text'}" placeholder="${label}">`;
     fieldsEl.appendChild(w);
   });
-  noteEl.textContent = p.entra ? "Foundry agents authenticate with Entra ID (az login) — no key needed. If the agent can’t be reached, Kavach auto-routes to the GHCP engine for now (clearly labelled in the report)." : "";
+  noteEl.textContent = p.entra
+    ? "Foundry agents authenticate with Entra ID (az login) — no key needed. If the agent can’t be reached, Kavach auto-routes to the GHCP engine for now (clearly labelled in the report)."
+    : (p.agent
+      ? "Connect any agent server that accepts an OpenAI-style {messages:[...]} body. Multi-turn is native, so cross-turn guardrails are tested. More agent frameworks (AutoGen, LangChain, A2A swarms) arrive in Phase 2 — Multi-Agent Arena."
+      : "");
   statusEl.innerHTML="";
 }
 sel.addEventListener("change",renderFields); renderFields();
