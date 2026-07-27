@@ -92,10 +92,14 @@
         <div class="st"><b>Step 3</b><br><span>Test &amp; run</span></div>
       </div>
 
-      <label for="provider">Provider (models &amp; agents)</label>
+      <label for="provider">Target to test — model or agent</label>
       <select id="provider"></select>
 
       <div id="fields" class="grid2"></div>
+
+      <label for="engine" style="margin-top:18px">Analysis engine — the model Kavach uses to attack &amp; judge</label>
+      <select id="engine"></select>
+      <p class="note">Kavach always uses an <strong>engine model</strong> (your BYOM key or GitHub Models) to drive adaptive attacks and act as an <strong>LLM-as-judge</strong> on the target's replies. The <strong>target</strong> above is what actually gets tested — a single model, an agent, or a whole multi-agent system.</p>
 
       <div class="btnrow">
         <button class="btn" id="testBtn">🔌 Test connection</button>
@@ -183,6 +187,12 @@ Object.entries(PROVIDERS).forEach(([id,p])=>{
   const o=document.createElement("option"); o.value=id; o.textContent=p.label; og.appendChild(o);
 });
 sel.value="github-models";
+
+const engineSel = document.getElementById("engine");
+Object.entries(PROVIDERS).filter(([id,p])=>p.group==="Models").forEach(([id,p])=>{
+  const o=document.createElement("option"); o.value=id; o.textContent=p.label; engineSel.appendChild(o);
+});
+engineSel.value="github-models";
 
 function renderFields(){
   const p=PROVIDERS[sel.value]; fieldsEl.innerHTML="";
