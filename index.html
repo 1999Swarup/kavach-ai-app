@@ -80,12 +80,30 @@
   </div>
 </div>
 
+<!-- BYOM / OPENWORKER BANNER -->
+<section style="padding-bottom:0">
+  <div class="wrap">
+    <div class="card" style="border-color:rgba(79,140,255,.4);background:linear-gradient(120deg,#0c1830,#0f1c3a)">
+      <h2>🔌 Bring the models &amp; agents you already run</h2>
+      <p class="sub" style="margin-bottom:10px">Kavach is bring-your-own-everything. In the spirit of open, bring-your-own-compute tooling like
+        <a href="https://github.com/andrewyng/openworker" target="_blank" rel="noopener">OpenWorker</a>,
+        you connect the LLM APIs you already pay for as the <strong>engine</strong>, and connect your <strong>agent</strong> as the target &mdash; no vendor lock-in.</p>
+      <div class="rbwb" style="justify-content:flex-start">
+        <span>OpenAI</span><span>Azure OpenAI / Foundry</span><span>Anthropic</span><span>Vertex</span>
+        <span>Local (Ollama)</span><span>GitHub Models</span><span>Any HTTP endpoint</span>
+        <span>Custom agent (messages API)</span><span>Foundry Agent</span>
+      </div>
+      <p class="note">🔒 Your keys are used only to run the scan and are never logged. In the hosted product they’re held in an encrypted secret store, scoped to a single run.</p>
+    </div>
+  </div>
+</section>
+
 <!-- CONNECT WIZARD -->
 <section>
   <div class="wrap">
     <div class="card">
       <h2>1 · Connect your model or agent</h2>
-      <p class="sub">Pick a <strong>model</strong> or an <strong>agent</strong>, enter its details, test the connection — then run the scan. Secrets stay with the backend and are never logged.</p>
+      <p class="sub">Pick a <strong>model</strong> or an <strong>agent</strong> and enter its details. This is the <strong>target</strong> &mdash; what actually gets tested. Secrets stay with the backend and are never logged.</p>
       <div class="steps">
         <div class="st"><b>Step 1</b><br><span>Choose provider</span></div>
         <div class="st"><b>Step 2</b><br><span>Enter endpoint / key</span></div>
@@ -96,17 +114,45 @@
       <select id="provider"></select>
 
       <div id="fields" class="grid2"></div>
+      <p class="note" id="providerNote"></p>
+    </div>
+  </div>
+</section>
 
-      <label for="engine" style="margin-top:18px">Analysis engine — the model Kavach uses to attack &amp; judge</label>
-      <select id="engine"></select>
-      <p class="note">Kavach always uses an <strong>engine model</strong> (your BYOM key or GitHub Models) to drive adaptive attacks and act as an <strong>LLM-as-judge</strong> on the target's replies. The <strong>target</strong> above is what actually gets tested — a single model, an agent, or a whole multi-agent system.</p>
+<!-- ANALYSIS ENGINE (separate card + why panel) -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="card">
+      <h2>2 · Analysis engine <span class="pill" style="background:var(--brand2)">powers the test</span></h2>
+      <p class="sub">The model Kavach drives to attack &amp; judge &mdash; separate from your target.</p>
+
+      <div class="banner" style="border-color:#21d4a0;background:rgba(33,212,160,.06)">
+        <strong style="color:var(--brand2)">Why Kavach needs an analysis engine.</strong>
+        Every scan is powered by an <strong>engine model</strong> that does two jobs your target can’t do for itself:
+        <ul style="margin:8px 0 0;padding-left:18px">
+          <li><strong>Adaptive attacker</strong> &mdash; generates multi-turn jailbreaks, prompt-injection and data-exfiltration attempts that adjust to how your target replies.</li>
+          <li><strong>LLM-as-judge</strong> &mdash; reads each reply and decides whether the target <em>actually</em> complied or leaked data, catching failures simple pattern-matching misses.</li>
+        </ul>
+        <p style="margin:8px 0 0">Keep it <strong>separate from the target</strong> for objective results. Use your own BYOM key for full control, or the one-click <strong>GitHub Models</strong> fallback. The engine only probes and evaluates &mdash; it never needs your production data.</p>
+      </div>
+
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:700;color:var(--text)">
+        <input type="checkbox" id="sameEngine" style="width:auto"> Use the same provider &amp; key as my target
+      </label>
+
+      <div id="engineWrap">
+        <label for="engine">Engine provider — the model Kavach uses to attack &amp; judge</label>
+        <select id="engine"></select>
+        <div class="btnrow" style="margin-top:10px">
+          <button class="btn" id="ghcpBtn" type="button">⚡ Use GitHub Models fallback</button>
+        </div>
+      </div>
 
       <div class="btnrow">
         <button class="btn" id="testBtn">🔌 Test connection</button>
         <button class="btn primary" id="scanBtn">🛡️ Run red-team scan</button>
       </div>
       <div class="status" id="status"></div>
-      <p class="note" id="providerNote"></p>
       <p class="note">In the hosted product these buttons call the Kavach backend API (Azure). This page is a live demo: “Run red-team scan” below renders a <strong>real recorded run</strong> so you can see exactly what you’d get.</p>
     </div>
   </div>
@@ -116,7 +162,7 @@
 <section>
   <div class="wrap">
     <div class="card" id="results">
-      <h2>2 · Your AI Risk Snapshot</h2>
+      <h2>3 · Your AI Risk Snapshot</h2>
       <p class="sub" id="resultsSub">Run a scan above to see results. Showing a real recorded run below.</p>
       <div class="btnrow" id="dlbar" style="margin:0 0 16px">
         <button class="btn" onclick="window.print()">⬇ Save as PDF</button>
@@ -194,6 +240,20 @@ Object.entries(PROVIDERS).filter(([id,p])=>p.group==="Models").forEach(([id,p])=
 });
 engineSel.value="github-models";
 
+const sameEngine=document.getElementById("sameEngine");
+const engineWrap=document.getElementById("engineWrap");
+function currentEngine(){
+  if(sameEngine && sameEngine.checked){
+    const p=PROVIDERS[sel.value];
+    return (p && p.group==="Models") ? sel.value : "github-models";
+  }
+  return engineSel.value;
+}
+if(sameEngine){
+  sameEngine.addEventListener("change",()=>{ engineWrap.style.display=sameEngine.checked?"none":"block"; });
+}
+document.getElementById("ghcpBtn").addEventListener("click",()=>{ engineSel.value="github-models"; });
+
 function renderFields(){
   const p=PROVIDERS[sel.value]; fieldsEl.innerHTML="";
   p.fields.forEach(([key,label,req])=>{
@@ -213,8 +273,8 @@ function renderFields(){
 sel.addEventListener("change",renderFields); renderFields();
 
 document.getElementById("testBtn").addEventListener("click",()=>{
-  const p=PROVIDERS[sel.value];
-  statusEl.innerHTML = `<span class="ok">Connection [${sel.value}]: OK</span> — validated (demo). In production this calls the backend’s <code>test_connection()</code>.`;
+  const eng=currentEngine();
+  statusEl.innerHTML = `<span class="ok">Connection OK</span> — target <code>${sel.value}</code> reachable; engine <code>${eng}</code> ready to attack &amp; judge (demo). In production this calls the backend’s <code>test_connection()</code>.`;
 });
 
 document.getElementById("scanBtn").addEventListener("click",()=>{
