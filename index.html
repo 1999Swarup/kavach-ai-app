@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Kavach App — Connect your model, red-team in 2 clicks</title>
-<meta name="description" content="Kavach App: bring your own model (OpenAI, Azure OpenAI/Foundry, Anthropic, Vertex, local, GitHub Models, custom) and run an automated AI red-team mapped to OWASP LLM Top 10 + DPDP/GDPR/HIPAA." />
+<title>RedSIQ Lab — Connect your model, red-team in 2 clicks</title>
+<meta name="description" content="RedSIQ Lab (The Red Security IQ Lab): bring your own model (OpenAI, Azure OpenAI/Foundry, Anthropic, Vertex, local, GitHub Models, custom) and run an automated AI red-team mapped to OWASP LLM Top 10 + DPDP/GDPR/HIPAA." />
 <style>
   :root{--bg:#070b16;--bg2:#0f1524;--card:#141c30;--line:#223049;--text:#eef2fb;
     --muted:#9aa8c6;--brand:#4f8cff;--brand2:#21d4a0;--danger:#ff5c72;--warn:#feca57;--r:14px;}
@@ -64,8 +64,8 @@
 <body>
 <header>
   <div class="wrap">
-    <div class="logo">Kavach<span>AI</span> · App</div>
-    <a class="nav-cta" href="mailto:founders@kavach.ai?subject=Book%20a%20Free%20Demo%20Call%20-%20Kavach%20App">Book a Free Demo Call</a>
+    <div class="logo"><span style="color:var(--danger)">Red</span><span>SIQ</span> Lab</div>
+    <a class="nav-cta" href="mailto:founders@kavach.ai?subject=Book%20a%20Free%20Demo%20Call%20-%20RedSIQ%20Lab">Book a Free Demo Call</a>
   </div>
 </header>
 
@@ -73,7 +73,7 @@
   <div class="wrap">
     <span class="badge">BYOM · Bring Your Own Model</span>
     <h1>Connect your model. <em>Red-team in 2 clicks.</em></h1>
-    <p class="lead">Point Kavach at any model — OpenAI, Azure OpenAI / Foundry, Anthropic, Vertex,
+    <p class="lead">Point RedSIQ Lab at any model — OpenAI, Azure OpenAI / Foundry, Anthropic, Vertex,
       local (Ollama), GitHub Models, or a custom endpoint — and get an automated red-team mapped to
       <strong>OWASP LLM Top 10</strong> + <strong>DPDP / GDPR / HIPAA</strong>. First month free.</p>
     <div class="rbwb"><span>🔴 Red-team</span><span>🔵 Blue-team</span><span>⬜ White-box</span><span>⬛ Black-box</span></div>
@@ -126,7 +126,7 @@
       <p class="sub">The model Kavach drives to attack &amp; judge &mdash; separate from your target.</p>
 
       <div class="banner" style="border-color:#21d4a0;background:rgba(33,212,160,.06)">
-        <strong style="color:var(--brand2)">Why Kavach needs an analysis engine.</strong>
+        <strong style="color:var(--brand2)">Why RedSIQ Lab needs an analysis engine.</strong>
         Every scan is powered by an <strong>engine model</strong> that does two jobs your target can’t do for itself:
         <ul style="margin:8px 0 0;padding-left:18px">
           <li><strong>Adaptive attacker</strong> &mdash; generates multi-turn jailbreaks, prompt-injection and data-exfiltration attempts that adjust to how your target replies.</li>
@@ -140,7 +140,7 @@
       </label>
 
       <div id="engineWrap">
-        <label for="engine">Engine provider — the model Kavach uses to attack &amp; judge</label>
+        <label for="engine">Engine provider — the model RedSIQ Lab uses to attack &amp; judge</label>
         <select id="engine"></select>
         <div class="btnrow" style="margin-top:10px">
           <button class="btn" id="ghcpBtn" type="button">⚡ Use GitHub Models fallback</button>
@@ -175,9 +175,9 @@
 
 <footer>
   <div class="wrap">
-    <div class="logo" style="margin-bottom:8px">Kavach<span>AI</span></div>
+    <div class="logo" style="margin-bottom:8px"><span style="color:var(--danger)">Red</span><span>SIQ</span> Lab</div>
     BYOM AI red-team · OWASP LLM Top 10 · DPDP / GDPR / HIPAA readiness (not legal certification).<br/>
-    Marketing site: <a href="https://1999swarup.github.io/kavach-ai-site/">kavach-ai-site</a> · © 2026 Kavach AI.
+    Marketing site: <a href="https://1999swarup.github.io/kavach-ai-site/">RedSIQ Lab site</a> · © 2026 RedSIQ Lab (The Red Security IQ Lab).
   </div>
 </footer>
 
@@ -195,7 +195,7 @@ const PROVIDERS = {
   "agent-http":   {label:"Custom agent (messages API)", group:"Agents", fields:[["endpoint","Agent endpoint URL",true],["conversation_id","Conversation id (optional)",false]], agent:true},
 };
 
-// --- Real recorded run (from an actual Kavach multi-technique scan) ---
+// --- Real recorded run (from an actual RedSIQ Lab multi-technique scan) ---
 const RUN = {
   client: "Foundry Prompt Agent 6e0463bf",
   engine: "github-models",
